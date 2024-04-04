@@ -2,29 +2,15 @@ use deno_core::op2;
 use std::{path::Path, rc::Rc};
 use deno_core::error::AnyError;
 
-async fn run_js(file_path: &str) -> Result<(), AnyError> {
-    let main_module = deno_core::resolve_path(file_path, Path::new("/home/lng2020/runjs"))?;
-    let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
-        module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
-        ..Default::default()
-    });
-    js_runtime.execute_script("[runjs:runtime.js]", include_str!("/home/lng2020/runjs/runtime.js")).unwrap();
-
-    let mod_id = js_runtime.load_main_es_module(&main_module).await?;
-    let result = js_runtime.mod_evaluate(mod_id);
-    js_runtime.run_event_loop(Default::default()).await?;
-    result.await
-}
-
 deno_core::extension!(
-    js_runtime,
+    my_extension,
     ops = [
         op_read_file,
         op_write_file,
         op_remove_file
     ],
-    esm_entry_point = "runtime.js",
-    esm = [dir "", "runtime.js"]
+    esm_entry_point = "ext:my_extension/extension.js",
+    esm = [dir "", "extension.js"]
 );
 
 #[op2(async)]
@@ -46,6 +32,21 @@ async fn op_write_file(#[string] path: String,#[string] contents: String) -> Res
 async fn op_remove_file(#[string] path: String) -> Result<(), AnyError> {
     std::fs::remove_file(path)?;
     Ok(())
+}
+
+async fn run_js(file_path: &str) -> Result<(), AnyError> {
+    let main_module = deno_core::resolve_path(file_path, Path::new("/home/lng2020/runjs"))?;
+    let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
+        module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
+        extensions: vec![my_extension::init_ops_and_esm()], 
+        ..Default::default()
+    });
+    js_runtime.execute_script("[runjs:runtime.js]", include_str!("/home/lng2020/runjs/runtime.js")).unwrap();
+
+    let mod_id = js_runtime.load_main_es_module(&main_module).await?;
+    let result = js_runtime.mod_evaluate(mod_id);
+    js_runtime.run_event_loop(Default::default()).await?;
+    result.await
 }
 
 fn main() {
