@@ -1,3 +1,4 @@
+// @ts-nocheck
 my_console.log("Hello", "runjs!");
 my_console.error("Error", "runjs!");
 
@@ -21,3 +22,11 @@ my_console.log("File removed", path);
 const url = "https://deno.land/std@0.177.0/examples/welcome.ts";
 const content = await extension.fetch(url);
 my_console.log("Fetched from", url, "content:", content);
+
+// ts
+interface Foo {
+    bar: string;
+    fizz: number;
+}
+
+let foo: Foo;
