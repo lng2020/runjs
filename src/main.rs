@@ -58,11 +58,17 @@ async fn run_js(file_path: &str) -> Result<(), AnyError> {
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 2{
+        eprintln!("Usage: runjs <file_path>");
+        std::process::exit(1);
+    }
+    let file_path = &args[1];
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap();
-    if let Err(err) = runtime.block_on(run_js("example.js")) {
-        eprintln!("{}", err);
+    if let Err(err) = runtime.block_on(run_js(file_path)) {
+        eprintln!("error: {err}");
     }
 }
