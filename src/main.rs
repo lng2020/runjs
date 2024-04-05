@@ -10,7 +10,7 @@ deno_core::extension!(
         op_remove_file
     ],
     esm_entry_point = "ext:my_extension/extension.js",
-    esm = [dir "", "extension.js"]
+    esm = [dir "src", "extension.js"]
 );
 
 #[op2(async)]
@@ -41,7 +41,7 @@ async fn run_js(file_path: &str) -> Result<(), AnyError> {
         extensions: vec![my_extension::init_ops_and_esm()], 
         ..Default::default()
     });
-    js_runtime.execute_script("[runjs:runtime.js]", include_str!("/home/lng2020/runjs/runtime.js")).unwrap();
+    js_runtime.execute_script("[runjs:runtime.js]", include_str!("/home/lng2020/runjs/src/runtime.js")).unwrap();
 
     let mod_id = js_runtime.load_main_es_module(&main_module).await?;
     let result = js_runtime.mod_evaluate(mod_id);
