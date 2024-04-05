@@ -7,7 +7,8 @@ deno_core::extension!(
     ops = [
         op_read_file,
         op_write_file,
-        op_remove_file
+        op_remove_file,
+        op_fetch
     ],
     esm_entry_point = "ext:my_extension/extension.js",
     esm = [dir "", "extension.js"]
@@ -32,6 +33,13 @@ async fn op_write_file(#[string] path: String,#[string] contents: String) -> Res
 async fn op_remove_file(#[string] path: String) -> Result<(), AnyError> {
     std::fs::remove_file(path)?;
     Ok(())
+}
+
+#[op2(async)]
+#[string]
+async fn op_fetch(#[string] url: String) -> Result<String, AnyError> {
+    let body = reqwest::get(&url).await?.text().await?;
+    Ok(body)
 }
 
 async fn run_js(file_path: &str) -> Result<(), AnyError> {
