@@ -1,5 +1,5 @@
 use deno_ast::{MediaType, ParseParams, SourceTextInfo};
-use deno_core::{futures::FutureExt, op2, ModuleLoadResponse, ModuleType};
+use deno_core::{futures::FutureExt, ModuleLoadResponse, ModuleType};
 use std::{ffi::OsStr, path::Path, rc::Rc};
 use deno_core::error::AnyError;
 
@@ -12,7 +12,7 @@ deno_core::extension!(
         op_fetch
     ],
     esm_entry_point = "ext:my_extension/extension.js",
-    esm = [dir "src", "extension.js"]
+    esm = [dir "", "extension.js"]
 );
 
 #[op2(async)]
@@ -43,6 +43,7 @@ async fn op_fetch(#[string] url: String) -> Result<String, AnyError> {
     Ok(body)
 }
 
+static RUNTIME_SNAPSHOT: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/snapshot.bin"));
 struct TsModuleLoader;
 
 impl deno_core::ModuleLoader for TsModuleLoader {
@@ -108,6 +109,7 @@ async fn run_js(file_path: &str) -> Result<(), AnyError> {
     let main_module = deno_core::resolve_path(file_path, Path::new("/home/lng2020/runjs"))?;
     let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
         module_loader: Some(Rc::new(TsModuleLoader)),
+        startup_snapshot: Some(RUNTIME_SNAPSHOT),
         extensions: vec![my_extension::init_ops_and_esm()], 
         ..Default::default()
     });

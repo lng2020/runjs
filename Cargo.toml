@@ -10,3 +10,8 @@ deno_ast = {version = "0.35.0", features = ["transpiling"]}
 deno_core = "0.272.0"
 reqwest = "0.12.2"
 tokio = { version = "1.37.0", features = ["full"] }
+
+[build-dependencies]
+deno_core = "0.272.0"
+tokio = { version = "1.37.0", features = ["full"] }
+reqwest = "0.12.2"
