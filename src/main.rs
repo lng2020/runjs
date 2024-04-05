@@ -1,5 +1,5 @@
 use deno_ast::{MediaType, ParseParams, SourceTextInfo};
-use deno_core::{futures::FutureExt, ModuleLoadResponse, ModuleType};
+use deno_core::{futures::FutureExt, op2, ModuleLoadResponse, ModuleType};
 use std::{ffi::OsStr, path::Path, rc::Rc};
 use deno_core::error::AnyError;
 
@@ -12,7 +12,7 @@ deno_core::extension!(
         op_fetch
     ],
     esm_entry_point = "ext:my_extension/extension.js",
-    esm = [dir "", "extension.js"]
+    esm = [dir "src", "extension.js"]
 );
 
 #[op2(async)]
